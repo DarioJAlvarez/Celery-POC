@@ -25,7 +25,7 @@ def add(x, y):
 ```
 
 ## Run Celery worker
-```celery -A tasks worker --loglevel=INFO```
+```celery -A main worker --loglevel=INFO  --pool=gevent```
 
 
 ## Celery client
@@ -38,4 +38,16 @@ app = Celery('tasks', broker=BROKER_URL, backend=BACKEND_URL)
 
 result = app.send_task("add", kwargs=(4, 5))
 response = result.get()  # Expected 9
+```
+
+## Run redis container
+
+### Backend
+```
+docker run --name redis-backend -p 6380:6379 -d redis
+```
+
+### Broker
+```
+docker run --name redis-broker -p 6379:6379 -d redis
 ```
