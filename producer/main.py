@@ -19,5 +19,5 @@ another_short_result = app.send_task("add_short", (5, 6), apply_async=True)
 response = another_short_result.get()
 print(f'Last task finished in: {start - time.time() :.2f} seconds')
 
-# response = long_result.get()
+response = long_result.get()
 # print(f'Response: {response}')
