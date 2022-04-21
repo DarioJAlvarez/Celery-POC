@@ -3,7 +3,8 @@
 ## What is Celery
 Celery is a task queue that is used to distribute work along threads or machines.  
 A task's queue input is an unit of work called task.  
-Celery communicates via messages, usually using a broker to mediate between clients and workers.
+Celery communicates via messages, usually using a broker to mediate between clients and workers.  
+Someone demanding the execution of a task is the 'producer' and the executor is the 'worker'.
 
 ## Broker
 Celery requires a solution to send and receive messages; usually this comes in the form of a separate service called a message broker.
@@ -25,7 +26,9 @@ def add(x, y):
 ```
 
 ## Run Celery worker
-```celery -A main worker --loglevel=INFO  --pool=gevent```
+```
+celery -A main worker --loglevel=INFO  --pool=gevent
+```
 
 
 ## Celery client
@@ -50,4 +53,20 @@ docker run --name redis-backend -p 6380:6379 -d redis
 ### Broker
 ```
 docker run --name redis-broker -p 6379:6379 -d redis
+```
+
+## Execution pools
+When you start a Celery worker on the command line via ```celery --app=...```, you just start a supervisor process. The Celery worker itself does not process any tasks. It spawns child processes (or threads) and deals with all the book keeping stuff. The child processes (or threads) execute the actual tasks. These child processes (or threads) are also known as the execution pool.
+
+### Pool options
+- solo: single process which runs inside worker process. Interesting for CPU bound tasks in microservices environment using K8s for example.
+- gevent: useful for I/O bound tasks. By specifiying a number of threads, Celery creates child processes to switch between tasks when a processed stay at idle state.
+- eventlet: same as __gevent__.
+- prefork: based on multiprocessing package, it's usefull for executing CPU bound tasks in parallel.
+
+
+## Concurrency
+Allows to set the number of processes/threads to be started by the worker. To enable concurrency we must start celery app with this command:
+```
+celery -A main worker --loglevel=INFO  --pool=gevent --concurrency=10
 ```
