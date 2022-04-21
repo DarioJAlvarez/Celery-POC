@@ -1,6 +1,5 @@
 from celery import Celery
-import asyncio
-from asgiref.sync import async_to_sync
+import requests
 
 BROKER_URL = 'redis://localhost:6379/0'
 BACKEND_URL = 'redis://localhost:6380/0'
@@ -8,33 +7,19 @@ app = Celery('tasks', broker=BROKER_URL, backend=BACKEND_URL)
 
 
 
-##################################################################
-### LONG TASK (10s)
-##################################################################
-
-async def long_task_async(x, y):
-    await asyncio.sleep(10)
-    return x + y
-
 @app.task(name='add_long')
 def long_task(x, y):
     print('Executing long task...')
-    result = async_to_sync(long_task_async)(x, y)
-    print('Long task finished!')
-    return f'long task finished: {result}'
-
-
-##################################################################
-### SHORT TASK (1s)
-##################################################################
-
-async def short_task_async(x, y):
-    await asyncio.sleep(1)
+    # Time consuming request
+    response = requests.get('https://www1.ncdc.noaa.gov/pub/data/cdo/samples/PRECIP_HLY_sample_csv.csv')
+    print(f'Long task finished!. Status code: {response.status_code}')
     return x + y
+
 
 @app.task(name='add_short')
 def short_task(x, y):
     print('Executing short task...')
-    result = async_to_sync(short_task_async)(x, y)
-    print('Short task finished!')
-    return f'short task finished: {result}'
+    # Fast request
+    response = requests.get('https://www.google.com')
+    print(f'Short task finished!. Status code: {response.status_code}')
+    return x + y
