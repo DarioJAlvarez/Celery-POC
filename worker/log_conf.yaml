@@ -1,0 +1,14 @@
+version: 1
+formatters: 
+  simple:
+    class: logging.Formatter
+    format: '%(asctime)s - %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: simple
+    stream: ext://sys.stdout
+loggers:
+  celery_override:
+    level: DEBUG
+    handlers: [console]
