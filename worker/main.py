@@ -3,9 +3,9 @@ from celery import Celery
 from celery.signals import setup_logging
 import requests
 from task_formatter import TaskFormatter
-# from celery.app.log import TaskFormatter
-from celery.utils.log import get_task_logger
 import logging
+import logging.config
+import yaml
 
 
 BROKER_URL = 'redis://localhost:6379/0'
@@ -15,17 +15,13 @@ app = Celery('tasks', broker=BROKER_URL, backend=BACKEND_URL)
 
 @setup_logging.connect
 def setup_task_logger(**_):
-    # logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-    logger = logging.getLogger()
-    sh = logging.StreamHandler()
-    sh.setFormatter(TaskFormatter('%(asctime)s - %(task_id)s - %(levelname)s - %(message)s'))
-    logger.setLevel(logging.INFO)
-    logger.addHandler(sh)
+    with open('./log_conf.yaml', 'r') as stream:
+        config = yaml.load(stream, Loader=yaml.FullLoader)
+    print(config)
+    logging.config.dictConfig(config)
         
 
-# logger = get_task_logger(__name__)
-logger = logging.getLogger(__name__)
-logger.setLevel('DEBUG')
+logger = logging.getLogger('celery_override')  # Name defined in log_conf.yaml
 
 
 @app.task(name='add_long')
