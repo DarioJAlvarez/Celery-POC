@@ -1,8 +1,6 @@
-from pkgutil import get_loader
 from celery import Celery
 from celery.signals import setup_logging
 import requests
-from task_formatter import TaskFormatter
 import logging
 import logging.config
 import yaml
@@ -15,10 +13,10 @@ app = Celery('tasks', broker=BROKER_URL, backend=BACKEND_URL)
 
 @setup_logging.connect
 def setup_task_logger(**_):
-    with open('./log_conf.yaml', 'r') as stream:
-        config = yaml.load(stream, Loader=yaml.FullLoader)
-    print(config)
-    logging.config.dictConfig(config)
+    from logging.config import dictConfig
+    with open('log_conf.yaml', 'r') as f:
+        config = yaml.safe_load(f.read())
+        dictConfig(config)
         
 
 logger = logging.getLogger('celery_override')  # Name defined in log_conf.yaml

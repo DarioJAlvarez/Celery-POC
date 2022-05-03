@@ -1,22 +1,17 @@
 version: 1
 formatters:
-  task_format:
-    class: task_formatter.TaskFormatter
-    format: '%(asctime)s - %(task_id)s - %(levelname)s - %(message)s'
+  simple_format:
+    # class: task_formatter.TaskFormatter
     # format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    class: logging.Formatter
+    format: '%(asctime)s - %(levelname)s - %(message)s'
 handlers:
   console:
     class: logging.StreamHandler
-    formatter: task_format
+    formatter: simple_format
     stream: ext://sys.stdout
-    filters: [correlation_id]
-  file:
-    class: logging.FileHandler
-    formatter: task_format
-    filename: log/test.log
-    filters: [correlation_id]
 loggers:
   celery_override:
     level: DEBUG
-    handlers: [console, file]
+    handlers: [console]
     propagate: yes
