@@ -1,8 +1,11 @@
+from pkgutil import get_loader
 from celery import Celery
+from celery.signals import setup_logging
 import requests
-from celery.signals import after_setup_task_logger
-from celery.app.log import TaskFormatter
+from task_formatter import TaskFormatter
+# from celery.app.log import TaskFormatter
 from celery.utils.log import get_task_logger
+import logging
 
 
 BROKER_URL = 'redis://localhost:6379/0'
@@ -10,12 +13,18 @@ BACKEND_URL = 'redis://localhost:6380/0'
 app = Celery('tasks', broker=BROKER_URL, backend=BACKEND_URL)
 
 
-@after_setup_task_logger.connect
-def setup_task_logger(logger, *args, **kwargs):
-    for handler in logger.handlers:
-        handler.setFormatter(TaskFormatter('%(asctime)s - %(task_id)s - %(task_name)s - %(name)s - %(levelname)s - %(message)s'))
+@setup_logging.connect
+def setup_task_logger(**_):
+    # logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    logger = logging.getLogger()
+    sh = logging.StreamHandler()
+    sh.setFormatter(TaskFormatter('%(asctime)s - %(task_id)s - %(levelname)s - %(message)s'))
+    logger.setLevel(logging.INFO)
+    logger.addHandler(sh)
+        
 
-logger = get_task_logger(__name__)
+# logger = get_task_logger(__name__)
+logger = logging.getLogger(__name__)
 logger.setLevel('DEBUG')
 
 
