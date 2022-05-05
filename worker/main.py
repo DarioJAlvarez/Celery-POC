@@ -1,7 +1,6 @@
 from celery import Celery
 from celery.signals import setup_logging
 import requests
-import logging
 import logging.config
 import yaml
 
@@ -17,7 +16,7 @@ def setup_task_logger(**_):
     with open('log_conf.yaml', 'r') as f:
         config = yaml.safe_load(f.read())
         dictConfig(config)
-        
+
 
 logger = logging.getLogger('celery_override')  # Name defined in log_conf.yaml
 

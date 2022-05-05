@@ -1,10 +1,8 @@
 version: 1
 formatters:
   simple_format:
-    # class: task_formatter.TaskFormatter
-    # format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    class: logging.Formatter
-    format: '%(asctime)s - %(levelname)s - %(message)s'
+    class: task_formatter.TaskFormatter
+    format: '%(asctime)s - %(levelname)s - [%(task_id)s] - %(module)s - %(funcName)s - %(message)s'
 handlers:
   console:
     class: logging.StreamHandler
@@ -12,6 +10,11 @@ handlers:
     stream: ext://sys.stdout
 loggers:
   celery_override:
+    level: DEBUG
+    handlers: [console]
+    propagate: yes
+  # Logger used by Celery itself, to provide info about tasks execution.
+  celery.app.trace:
     level: DEBUG
     handlers: [console]
     propagate: yes
