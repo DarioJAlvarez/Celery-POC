@@ -1,20 +1,2 @@
-version: 1
-formatters:
-  simple_format:
-    (): task_formatter.TaskFormatter
-    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    # class: logging.Formatter
-    # format: '%(asctime)s - %(levelname)s - %(message)s'
-handlers:
-  console:
-    class: logging.StreamHandler
-    formatter: simple_format
-    stream: ext://sys.stdout
-loggers:
-  celery_override:
-    level: DEBUG
-    handlers: [console]
-    propagate: yes
-root:
-  level: debug
-  handlers: [console]
+worker_format: '%(asctime)s - %(levelname)s --------------------- %(module)s - %(funcName)s - %(message)s'
+task_format: '%(asctime)s - %(levelname)s - [%(task_id)s] - %(module)s - %(funcName)s - %(message)s'
