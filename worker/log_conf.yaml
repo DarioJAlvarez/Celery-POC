@@ -18,3 +18,16 @@ loggers:
     level: DEBUG
     handlers: [console]
     propagate: yes
+  # Loggers for Celery startup.
+  celery.worker.consumer:
+    level: DEBUG
+    handlers: [console]
+    propagate: yes
+  celery.apps:
+    level: DEBUG
+    handlers: [console]
+    propagate: yes
+  celery.worker.pidbox:
+    level: DEBUG
+    handlers: [console]
+    propagate: yes
