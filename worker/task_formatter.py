@@ -26,4 +26,4 @@ class TaskFormatter(logging.Formatter):
         try:
             return record.data['id']
         except AttributeError:
-            return "CELERY STARTUP"
+            return "00000000-0000-0000-0000-000000000000"
