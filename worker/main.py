@@ -1,25 +1,39 @@
 from celery import Celery
+from celery.signals import setup_logging
 import requests
+import logging.config
+import yaml
+
 
 BROKER_URL = 'redis://localhost:6379/0'
 BACKEND_URL = 'redis://localhost:6380/0'
 app = Celery('tasks', broker=BROKER_URL, backend=BACKEND_URL)
 
 
+@setup_logging.connect
+def setup_task_logger(**_):
+    from logging.config import dictConfig
+    with open('log_conf.yaml', 'r') as f:
+        config = yaml.safe_load(f.read())
+        dictConfig(config)
+
+
+logger = logging.getLogger('celery_override')  # Name defined in log_conf.yaml
+
 
 @app.task(name='add_long')
 def long_task(x, y):
-    print('Executing long task...')
+    logger.debug('Executing long task...')
     # Time consuming request
     response = requests.get('https://www1.ncdc.noaa.gov/pub/data/cdo/samples/PRECIP_HLY_sample_csv.csv')
-    print(f'Long task finished!. Status code: {response.status_code}')
+    logger.debug(f'Long task finished! Response: {response}')
     return x + y
 
 
 @app.task(name='add_short')
 def short_task(x, y):
-    print('Executing short task...')
+    logger.debug('Executing short task...')
     # Fast request
     response = requests.get('https://www.google.com')
-    print(f'Short task finished!. Status code: {response.status_code}')
+    logger.debug(f'Short task finished! Response: {response}')
     return x + y
