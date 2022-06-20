@@ -27,7 +27,7 @@ def add(x, y):
 
 ## Run Celery worker
 ```
-celery -A main worker --loglevel=INFO  --pool=gevent
+python -m celery -A main worker --loglevel=INFO  --pool=gevent
 ```
 
 
@@ -39,7 +39,7 @@ BROKER_URL = 'redis://localhost:6379/0'
 BACKEND_URL = 'redis://localhost:6380/0'
 app = Celery('tasks', broker=BROKER_URL, backend=BACKEND_URL)
 
-result = app.send_task("add", kwargs=(4, 5))
+result = app.send_task("add", args=(4, 5))
 response = result.get()  # Expected 9
 ```
 
@@ -68,5 +68,17 @@ When you start a Celery worker on the command line via ```celery --app=...```, y
 ## Concurrency
 Allows to set the number of processes/threads to be started by the worker. To enable concurrency we must start celery app with this command:
 ```
-celery -A main worker --loglevel=INFO  --pool=gevent --concurrency=10
+python -m celery -A main worker --loglevel=INFO  --pool=gevent --concurrency=10
+```
+
+
+## Log traceability (correlation-id propagation)
+When working in a microservice application, it's mandatory for log traceability 
+that microservices propagate a correlation id which will be printed in logging.
+
+Celery provides a built-in tool to achive this, so we don't have to create our tasks
+with an extra parameter. By just sending an extra argument to the task call, the logger
+will be able to print the correlation id passed with no extra configuration.
+```python
+task_call = app.send_task("add_long", (3, 4), apply_async=True, task_id=correlation_id.get())
 ```
